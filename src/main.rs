@@ -1,9 +1,11 @@
+use regex::Regex;
 use std::fs;
 
 fn main() {
-    let path = "example.java";
-    let contents = fs::read_to_string(path)
-        .expect("Failed to read file");
+    let contents = fs::read_to_string("example.java").unwrap();
+    let re = Regex::new(r"//.*|/\*[\s\S]*?\*/").unwrap();
 
-    println!("{}", contents);
+    for m in re.find_iter(&contents) {
+        print!("---{}", m.as_str());
+    }
 }
