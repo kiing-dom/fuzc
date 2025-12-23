@@ -25,20 +25,37 @@ fn parse_comments<'a>(s: &'a str) -> Vec<Comment< 'a>> {
 }
 
 fn main() {
-    let contents = fs::read_to_string("example.java").expect("Could not read file");
-    let comments = parse_comments(&contents);
+    let mut comments = Vec::new();
+    let mut file_contents = Vec::new();
 
     let curr_dir = env::current_dir().expect("Failed to get current directory");
 
-    match fs::read_dir(curr_dir) {
+    match fs::read_dir(&curr_dir) {
         Ok(entries) => {
-            for entry in entries {
-                if let Ok(entry) = entry {
-                    println!("{}", entry.path().display())
+            for entry in entries.flatten() {
+
+                let path = entry.path();
+
+                if path.is_file() {
+                    if path.extension().and_then(|s| s.to_str()) == Some("java") {
+                        if let Ok(content) = fs::read_to_string(&path) {
+                            file_contents.push(content);
+                        }
+                    }
                 }
             }
         },
         Err(e) => eprintln!("Error reading directory {}", e),
+    }
+
+    for content in &file_contents {
+        let found = parse_comments(content);
+        for c in found {
+            comments.push(Comment{
+                line: c.line,
+                text: c.text
+            });
+        }
     }
 
     // print lines found
