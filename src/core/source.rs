@@ -16,9 +16,13 @@ pub fn load_files(paths: &[PathBuf]) -> Vec<SourceFile> {
                 .and_then(|n| n.to_str())
                 .unwrap_or_default()
                 .to_string();
-            files.push(SourceFile { name, content });
+            files.push(SourceFile { name, content: normalize_line_endings(&content)});
         }
     }
 
     files
+}
+
+fn normalize_line_endings(content: &str) -> String {
+    content.replace("\r\n", "\n").replace("\r", "\n")
 }

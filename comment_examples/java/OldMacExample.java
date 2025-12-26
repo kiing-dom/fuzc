@@ -1,0 +1,1 @@
+public class OldMacExample {    // This is an old Mac-style file with CR line endings    public static void main(String[] args) {        /* Multi-line comment           in old Mac format */        System.out.println("Old Mac file");    }}
