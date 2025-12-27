@@ -4,6 +4,7 @@ use std::fs;
 
 pub struct SourceFile {
     pub name: String,
+    pub path: PathBuf,
     pub content: String,
 }
 
@@ -16,7 +17,11 @@ pub fn load_files(paths: &[PathBuf]) -> Vec<SourceFile> {
                 .and_then(|n| n.to_str())
                 .unwrap_or_default()
                 .to_string();
-            files.push(SourceFile { name, content: normalize_line_endings(&content)});
+            files.push(SourceFile { 
+                name,
+                path: path.clone(),
+                content: normalize_line_endings(&content)
+            });
         }
     }
 

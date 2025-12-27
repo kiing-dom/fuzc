@@ -1,3 +1,5 @@
+use std::path::Path;
+
 pub enum Language {
     Java,
 
@@ -125,4 +127,14 @@ fn extract_java_comments(content: &str) -> Vec<CommentMatch> {
         }
     }
     comments
+}
+
+pub fn detect_language(file_path: &Path) -> Option<Language> {
+    match file_path.extension()?.to_str()? {
+        "java" => Some(Language::Java),
+        // rs - for rust
+        // py - for python
+        // etc
+        _ => None,
+    }
 }
