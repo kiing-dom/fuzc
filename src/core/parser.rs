@@ -6,7 +6,9 @@ pub enum Language {
 pub struct CommentMatch {
     pub start_byte: usize,
     pub end_byte: usize,
+    #[allow(dead_code)]
     pub text: String,
+    #[allow(dead_code)]
     pub comment_type: CommentType,
 }
 
@@ -15,9 +17,9 @@ pub enum CommentType {
     MultiLine, // multiline - language agnostic
 }
 
-pub fn extract_comments_from_content(content: &str, language: Language) {
+pub fn extract_comments_from_content(content: &str, language: Language) -> Vec<CommentMatch> {
     match language {
-        Language::Java => { extract_java_comments(content); }
+        Language::Java => extract_java_comments(content),
     }
 }
 
@@ -116,7 +118,7 @@ fn extract_java_comments(content: &str) -> Vec<CommentMatch> {
             JavaParseState::CharLiteral => {
                 match ch {
                     '\\' => { chars.next(); },
-                    '\'' => { JavaParseState::Code; },
+                    '\'' => { state = JavaParseState::Code; },
                     _ => { /* do nothing (keep scanning) */}
                 }
             }
