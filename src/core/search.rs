@@ -18,11 +18,11 @@ pub fn search<'a>(comments: &'a [Comment], query: &str, mode: SearchMode) -> Vec
         .filter(|comment| match mode {
             SearchMode::And => terms.iter().all(|term| {
                 comment.text.to_lowercase().contains(&term.to_lowercase())
-                    || comment.file_name.contains(&term.to_lowercase())
+                    || comment.file_name.to_lowercase().contains(&term.to_lowercase())
             }),
             SearchMode::Or => terms.iter().any(|term| {
                 comment.text.to_lowercase().contains(&term.to_lowercase())
-                    || comment.file_name.contains(&term.to_lowercase())
+                    || comment.file_name.to_lowercase().contains(&term.to_lowercase())
             }),
         })
         .collect();
