@@ -16,12 +16,14 @@ pub fn search<'a>(comments: &'a [Comment], query: &str, mode: SearchMode) -> Vec
     let mut results: Vec<&'a Comment<'a>> = comments
         .iter()
         .filter(|comment| match mode {
-            SearchMode::And => terms
-                .iter()
-                .all(|term| comment.text.to_lowercase().contains(&term.to_lowercase())),
-            SearchMode::Or => terms
-                .iter()
-                .any(|term| comment.text.to_lowercase().contains(&term.to_lowercase())),
+            SearchMode::And => terms.iter().all(|term| {
+                comment.text.to_lowercase().contains(&term.to_lowercase())
+                    || comment.file_name.contains(&term.to_lowercase())
+            }),
+            SearchMode::Or => terms.iter().any(|term| {
+                comment.text.to_lowercase().contains(&term.to_lowercase())
+                    || comment.file_name.contains(&term.to_lowercase())
+            }),
         })
         .collect();
 
@@ -31,12 +33,15 @@ pub fn search<'a>(comments: &'a [Comment], query: &str, mode: SearchMode) -> Vec
 }
 
 fn calculate_score(comment: &Comment<'_>, terms: &[&str]) -> usize {
+    let file_name_lower = comment.file_name.to_lowercase();
     let text_lower = comment.text.to_lowercase();
 
     // base score
     let mut score = 0;
     for term in terms {
-        if let Some(pos) = text_lower.find(term) {
+        if let Some(pos) = file_name_lower.find(term) {
+            score += 2000usize.saturating_sub(pos);
+        } else if let Some(pos) = text_lower.find(term) {
             score += 1000usize.saturating_sub(pos);
         }
     }
