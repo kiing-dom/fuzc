@@ -1,4 +1,5 @@
 mod core;
+mod tui;
 
 use clap::Parser;
 use std::path::Path;
