@@ -1,1 +1,3 @@
-# comment indexer
+# fuzc
+
+A fuzzy finder for code comments
