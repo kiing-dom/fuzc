@@ -10,12 +10,14 @@ use ratatui::{
     Terminal,
 };
 use crate::core::engine::Comment;
+use crate::core::search::SearchMode;
 
 pub struct TuiState<'a> {
     query: String,
     results: Vec<&'a Comment<'a>>,
     selected: usize,
     should_quit: bool,
+    strict_mode: bool,
 }
 
 pub fn run_tui() -> Result<(), Box<dyn std::error::Error>> {
@@ -45,6 +47,7 @@ fn run_tui_loop(terminal: &mut Terminal<CrosstermBackend<std::io::Stdout>>) -> R
         results: Vec::new(),
         selected: 0,
         should_quit: false,
+        strict_mode: false,
    };
 
    while !state.should_quit {
@@ -72,6 +75,10 @@ fn handle_key_event<'a>(state: &mut TuiState<'a>, comments: &'a [Comment<'a>], k
         KeyCode::Esc => {
             state.should_quit = true;
         }
+        KeyCode::Tab => {
+            state.strict_mode = !state.strict_mode;
+            update_search_results(state, comments);
+        }
         KeyCode::Char('c') if key.modifiers.contains(KeyModifiers::CONTROL) => {
             state.should_quit = true;
         }
@@ -98,13 +105,19 @@ fn handle_key_event<'a>(state: &mut TuiState<'a>, comments: &'a [Comment<'a>], k
 }
 
 fn update_search_results<'a>(state: &mut TuiState<'a>, comments: &'a [Comment<'a>]) {
+    let search_mode = if state.strict_mode {
+        SearchMode::And 
+    } else {
+        SearchMode::Or
+    };
+
     if state.query.is_empty() {
         state.results.clear();
     } else {
         state.results = crate::core::search::search(
             comments,
             &state.query,
-            crate::core::search::SearchMode::Or
+            search_mode,
         );
     }
 
